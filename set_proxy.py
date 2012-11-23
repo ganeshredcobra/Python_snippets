@@ -35,7 +35,7 @@ def temp_write():
 	commands.getoutput("touch /tmp/tmp_proxy")
 	#os.seteuid(0)
 	f = open('/tmp/tmp_proxy','w')
-	if (proxy[0]==True):	
+	if (proxy[0]==True):
 		f.write('Acquire::http::proxy "'+proxy[1]+'";\n')
 		f.write('Acquire::ftp::proxy "'+proxy[2]+'";\n')
 		f.write('Acquire::https::proxy "'+proxy[3]+'";\n')
@@ -45,7 +45,7 @@ def temp_write():
 		f.write('Acquire::http::proxy "'+proxy[1]+'";\n')
 		f.close()
 		return
-		
+
 def datas():
 	host = raw_input("Enter Proxy Host: ")
 	port = raw_input("Enter Proxy Port: ")
@@ -63,27 +63,35 @@ def datas():
 			https_proxy = 'https://'+proxyline
 			ftp_proxy = 'ftp://'+proxyline
 			return flag,http_proxy,https_proxy,ftp_proxy
-			
-		else:			
+
+		else:
 			http_proxy = 'http://'+proxylineproxyline
 			return flag,http_proxy
-			 
-			
+
+
 if os.geteuid()!=0:
     sys.exit("\nPlease  run this utility as root\n")
 else:
 	var = raw_input("Do you want to set proxy[y/n]: ")
 	if "y" in var:
 		os=idenos()
-		if(os=="Debian"):				
-				proxy=datas()		
-				temp_write()
-				commands.getoutput("/etc/apt/apt.conf.d/99synaptic /etc/apt/apt.conf.d/99synaptic.bak")
-				commands.getoutput("cat /tmp/tmp_proxy >> /etc/apt/apt.conf.d/99synaptic")
-				commands.getoutput("apt-get update")
-				print "Job Completed"
+		if(os=="Debian"):
+			proxy=datas()
+			temp_write()
+			commands.getoutput("cp /etc/apt/apt.conf.d/99synaptic /etc/apt/apt.conf.d/99synaptic.bak")
+			commands.getoutput("cat /tmp/tmp_proxy >> /etc/apt/apt.conf.d/99synaptic")
+			commands.getoutput("apt-get update")
+			print "Job Completed"
         elif(os=="Ubuntu"):
-                print "ubu"
+            proxy=datas()
+            temp_write()
+            commands.getoutput("cp /etc/apt/apt.conf /etc/apt/apt.conf.bak")
+            commands.getoutput("cat /tmp/tmp_proxy >> /etc/apt/apt.conf")
+            print "Job Completed"
+
+
+
+
 
 
 
