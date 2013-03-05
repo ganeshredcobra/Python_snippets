@@ -15,4 +15,4 @@ while True:
 		last_received, buffer = buffer.split('#')[-2:]
 		print last_received
 		os.system("espeak '%s'"%last_received)
-		#os.system("echo \'(voice_en1_mbrola)(SayText \'%s\')\' | festival",%a)
+        #os.system(' echo \'(voice_en1_mbrola)(SayText "%s")\' | festival'%last_received)
