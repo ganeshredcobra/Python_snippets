@@ -9,9 +9,18 @@ ret = []
 def iden_port():
 	raw=commands.getoutput("dmesg | grep 'GSM modem (1-port) converter now attached to'")
 	mod=raw.splitlines()
-	mod_port=mod[-3:]
-	for i in range(len(mod_port)):
-		devs.append(mod_port[i][-7:])
+	if (len(mod) == 0):
+		commands.getoutput('sudo usb_modeswitch -I -W -c /etc/usb_modeswitch.d/12d1\:1505')
+		time.sleep(10)
+		raw=commands.getoutput("dmesg | grep 'GSM modem (1-port) converter now attached to'")
+		mod=raw.splitlines()
+		mod_port=mod[-3:]
+		for i in range(len(mod_port)):
+			devs.append(mod_port[i][-7:])
+	else:
+		mod_port=mod[-3:]
+		for i in range(len(mod_port)):
+			devs.append(mod_port[i][-7:])
 
 def main():
 	
@@ -27,17 +36,20 @@ def main():
 	print devs
 	iden_port()
 	print devs
+	time.sleep(15)
 	for i in range(len(devs)):
 		print devs[i]
 		ser=serial.Serial('/dev/%s'%devs[i], baudrate=115200, timeout=.1, rtscts=0)
 		sendCommand("ATi")
 		#print ret
-		#print ret[0]
+		print ret[0]
 		if ret[0] == "Manufacturer: +GMI: HUAWEI TECHNOLOGIES CO., LTD":
 			print ":)"
 			break
 		else:
+			print "ddd"
 			pass
+
 
 if __name__ == "__main__":
 	main()
