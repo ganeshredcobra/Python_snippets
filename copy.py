@@ -25,6 +25,7 @@ import glob
 import re
 import os
 import subprocess
+import shlex
 
 # Add any other device pattern to read from
 dev_pattern = ['sd.*','mmcblk*']
@@ -43,31 +44,37 @@ def size(device):
                 print('Device:: {0}, Size:: {1} GiB'.format(device, size(device)))"""
                 
 def detect_devs():
-    First_SZ = subprocess.check_output('du -skh First', shell=True)
-    Second_SZ = subprocess.check_output('du -skh Second', shell=True)
-                
-def detect_devs():
     #os.system('lsblk -n -o MOUNTPOINT|grep media')
     procd = subprocess.check_output('lsblk -n -o MOUNTPOINT|grep media', shell=True)
-    #print (procd)
+    print (procd)
     First=procd.splitlines()[0]
     Second=procd.splitlines()[1]
     print (First)
     print (Second)
-    First_SZ = subprocess.check_output('du -sk %s'%First, shell=True)
-    Second_SZ = subprocess.check_output('du -sk %s'%Second, shell=True)
-    F_SZ=First_SZ.split()[0]
-    S_SZ=Second_SZ.split()[0]
-    print (F_SZ)
-    print (S_SZ)
-    if (int(F_SZ) > int(S_SZ)):
-        print ("F_SZ is bigger")
-    else:
-        print ("S_SZ is bigger")
-    Sor = subprocess.check_output('zenity --entry --title "Select Flash Drives" --text "Select Source Drive." %s %s'%(First,Second), shell=True)
-    Des = subprocess.check_output('zenity --entry --title "Select Flash Drives" --text "Select Destination Drive." %s %s'%(First,Second), shell=True)
-    print (Sor)
-    print (Des)
+    Sorz = subprocess.check_output('zenity --entry --title "Select Flash Drives" --text "Select Source Drive." %s %s'%(First,Second),       shell=True)
+    Desz = subprocess.check_output('zenity --entry --title "Select Flash Drives" --text "Select Destination Drive." %s %s'%(First,Second), shell=True)
+    print ("Source is "+Sorz)
+    print ("Destination is "+Desz)
 
+    Sorz_SZ_RW = subprocess.check_output('df -m %s'%Sorz, shell=True)
+    Desz_SZ_RW = subprocess.check_output('df -m %s'%Desz, shell=True)
+    Sorz_SZ=Sorz_SZ_RW.splitlines()[1].split()[3]
+    Desz_SZ=Desz_SZ_RW.splitlines()[1].split()[3]
+    print ("Free space in MB %s for"%Sorz+" "+ Sorz_SZ)
+    print ("Free space in MB %s for"%Desz+" "+ Desz_SZ)
+    if (int(Sorz_SZ) > int(Desz_SZ)):
+        print ("Not enough space in destination")
+    else:
+        print ("Copying :)")
+        print ("Source is "+Sorz)
+        print ("Destination is "+Desz)
+        Sorz_nl=Sorz+"/*"
+        Sorz_star=Sorz_nl.split()[0]+Sorz_nl.split()[1]
+        print ("Destination is %s"%Desz)
+        print ("Source * is %s"%Sorz_star)
+        One=Sorz_star.strip()
+        Two=Desz.strip()
+        subprocess.call('cp -R %s %s |zenity --progress --text "Copying" --pulsate --auto-close'%(One,Two), shell=True)
+  
 if __name__=='__main__':
     detect_devs()
