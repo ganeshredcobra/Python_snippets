@@ -20,12 +20,8 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-from __future__ import print_function
-import glob
-import re
 import os
 import subprocess
-import shlex
 
 # Add any other device pattern to read from
 dev_pattern = ['sd.*','mmcblk*']
@@ -58,12 +54,13 @@ def detect_devs():
 
     Sorz_SZ_RW = subprocess.check_output('df -m %s'%Sorz, shell=True)
     Desz_SZ_RW = subprocess.check_output('df -m %s'%Desz, shell=True)
-    Sorz_SZ=Sorz_SZ_RW.splitlines()[1].split()[3]
+    Sorz_SZ=Sorz_SZ_RW.splitlines()[1].split()[2]
     Desz_SZ=Desz_SZ_RW.splitlines()[1].split()[3]
     print ("Free space in MB %s for"%Sorz+" "+ Sorz_SZ)
     print ("Free space in MB %s for"%Desz+" "+ Desz_SZ)
     if (int(Sorz_SZ) > int(Desz_SZ)):
-        print ("Not enough space in destination")
+        #print ("Not enough space in destination")
+        subprocess.check_output('zenity --error --text "Not enough space in Destination! "',shell=True)
     else:
         print ("Copying :)")
         print ("Source is "+Sorz)
@@ -75,6 +72,7 @@ def detect_devs():
         One=Sorz_star.strip()
         Two=Desz.strip()
         subprocess.call('cp -R %s %s |zenity --progress --text "Copying" --pulsate --auto-close'%(One,Two), shell=True)
+        subprocess.check_output('zenity --info --text "Copying complete"',shell=True)
   
 if __name__=='__main__':
     detect_devs()
